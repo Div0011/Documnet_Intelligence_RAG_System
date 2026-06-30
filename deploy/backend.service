@@ -1,0 +1,16 @@
+[Unit]
+Description=DocIntel RAG Backend
+After=network.target
+
+[Service]
+Type=simple
+User=guestuser
+WorkingDirectory=/home/guestuser/Documnet_Intelligence_RAG_System/backend
+Environment="GROQ_API_KEY=your_groq_api_key_here"
+Environment="CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173,https://div0011.github.io"
+ExecStart=/usr/local/bin/uv run uvicorn app.main:app --host 0.0.0.0 --port 8000
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
