@@ -24,6 +24,7 @@ class UploadResponse(BaseModel):
 class QueryRequest(BaseModel):
     question: str = Field(..., min_length=1, max_length=2000)
     conversation_history: list[ChatMessage] = Field(default_factory=list)
+    sources: list[str] = Field(default_factory=list)
 
 
 class Source(BaseModel):

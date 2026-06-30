@@ -6,7 +6,7 @@ import shutil
 from app.core.config import settings
 from app.models.schemas import UploadResponse, QueryRequest, QueryResponse, StatusResponse
 from app.services.ingestion import ingest_many
-from app.services.embeddings import add_chunks, collection_stats, reset_collection
+from app.services.embeddings import add_chunks, collection_stats, reset_collection, delete_by_source
 from app.services.retrieval import retrieve as retrieve_chunks
 from app.services.qa import answer_question
 from app.services.insights import suggest_insights
@@ -67,14 +67,60 @@ async def query(request: QueryRequest):
     question = request.question.strip()
     if not question:
         raise HTTPException(status_code=400, detail="Question is required.")
-    chunks = retrieve_chunks(question)
+    chunks = retrieve_chunks(question, sources=request.sources or None)
     result = answer_question(question, chunks)
     return QueryResponse(**result)
 
 
 @router.get("/insights")
-async def insights():
-    return suggest_insights()
+async def insights(sources: str = ""):
+    source_list = [s.strip() for s in sources.split(",") if s.strip()] or None
+    return suggest_insights(sources=source_list)
+
+
+@router.get("/about")
+async def about():
+    import os
+    readme_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), "README.md")
+    readme_content = ""
+    try:
+        with open(readme_path, "r", encoding="utf-8") as f:
+            readme_content = f.read()
+    except Exception:
+        readme_content = "DocIntel RAG System - A latency-optimized document intelligence system."
+    return {
+        "name": "DocIntel RAG System",
+        "version": "1.0.0",
+        "creator": "Divyansh Awasthi",
+        "readme": readme_content,
+    }
+
+
+@router.get("/documents")
+async def list_documents():
+    from app.services.embeddings import get_collection
+    collection = get_collection()
+    results = collection.get(include=["metadatas"])
+    sources = []
+    if results and results.get("metadatas"):
+        seen = set()
+        for meta in results["metadatas"]:
+            if meta and meta.get("source") and meta["source"] not in seen:
+                seen.add(meta["source"])
+                sources.append(meta["source"])
+    return {"documents": sources}
+
+
+@router.delete("/documents/{filename}")
+async def delete_document(filename: str):
+    deleted = delete_by_source(filename)
+    file_path = os.path.join(UPLOAD_DIR, filename)
+    if os.path.exists(file_path):
+        try:
+            os.remove(file_path)
+        except OSError:
+            pass
+    return {"deleted": deleted}
 
 
 @router.post("/reset")

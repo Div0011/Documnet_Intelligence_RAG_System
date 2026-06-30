@@ -14,6 +14,10 @@ export default {
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
+        mono: ['SF Mono', 'Menlo', 'Monaco', 'monospace'],
+      },
+      spacing: {
+        '18': '4.5rem',
       },
     },
   },

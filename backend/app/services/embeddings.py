@@ -72,6 +72,19 @@ def collection_stats() -> Dict:
     return {"total_chunks": count, "documents_indexed": docs_indexed}
 
 
+def delete_by_source(source: str) -> int:
+    collection = get_collection()
+    results = collection.get(include=["metadatas"])
+    ids_to_delete = []
+    if results and results.get("ids"):
+        for i, meta in enumerate(results.get("metadatas", []) or []):
+            if meta and meta.get("source") == source:
+                ids_to_delete.append(results["ids"][i])
+    if ids_to_delete:
+        collection.delete(ids=ids_to_delete)
+    return len(ids_to_delete)
+
+
 def reset_collection():
     try:
         _client.delete_collection(COLLECTION_NAME)

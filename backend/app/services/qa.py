@@ -1,14 +1,15 @@
 import os
 from groq import Groq
+from app.core.config import settings
 
-MODEL = os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")
+MODEL = os.getenv("GROQ_MODEL", settings.GROQ_MODEL)
 _client = None
 
 
 def _get_client():
     global _client
     if _client is None:
-        api_key = os.environ.get("GROQ_API_KEY")
+        api_key = settings.GROQ_API_KEY
         if not api_key:
             raise RuntimeError("GROQ_API_KEY environment variable is not set.")
         _client = Groq(api_key=api_key)

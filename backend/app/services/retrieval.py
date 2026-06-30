@@ -8,8 +8,10 @@ MAX_DISTANCE = 1.0
 _reranker = CrossEncoder("cross-encoder/ms-marco-MiniLM-L-6-v2")
 
 
-def retrieve(question: str, top_k: int = TOP_K) -> List[Dict]:
+def retrieve(question: str, top_k: int = TOP_K, sources: list[str] | None = None) -> List[Dict]:
     raw_hits = query(question, n_results=20)
+    if sources:
+        raw_hits = [h for h in raw_hits if h.get("metadata", {}).get("source") in sources]
     relevant = [h for h in raw_hits if h["distance"] <= MAX_DISTANCE]
     if not relevant:
         return []

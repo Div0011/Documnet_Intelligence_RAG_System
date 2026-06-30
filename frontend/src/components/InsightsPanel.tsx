@@ -5,20 +5,32 @@ interface Props {
 export default function InsightsPanel({ insights }: Props) {
   if (!insights) {
     return (
-      <div className="bg-surface border border-border rounded-sm p-8 text-center">
-        <p className="text-sm text-muted">No insights available yet. Try uploading documents first.</p>
+      <div className="border border-neutral-200 bg-white p-10 text-center">
+        <div className="flex items-center justify-center gap-2 mb-3">
+          <div className="w-1 h-1 rounded-full bg-neutral-900" />
+          <h3 className="text-[11px] font-semibold uppercase tracking-[0.15em] text-neutral-400">
+            Suggested Insights
+          </h3>
+        </div>
+        <p className="text-sm text-neutral-400">No insights available yet. Select documents and switch to the Insights tab.</p>
       </div>
     )
   }
 
   return (
-    <div className="bg-surface border border-border rounded-sm p-6">
-      <div className="flex items-center gap-2 mb-4">
-        <div className="w-1.5 h-1.5 rounded-full bg-ink" />
-        <h3 className="text-xs font-semibold uppercase tracking-widest text-muted">Suggested Insights</h3>
+    <div className="border border-neutral-200 bg-white">
+      <div className="px-6 py-4 border-b border-neutral-100">
+        <div className="flex items-center gap-2">
+          <div className="w-1 h-1 rounded-full bg-neutral-900" />
+          <h3 className="text-[11px] font-semibold uppercase tracking-[0.15em] text-neutral-400">
+            Suggested Insights
+          </h3>
+        </div>
       </div>
-      <div className="text-sm text-ink/90 leading-relaxed whitespace-pre-wrap">
-        {insights}
+      <div className="p-6">
+        <div className="text-sm text-neutral-700 leading-relaxed whitespace-pre-wrap">
+          {insights}
+        </div>
       </div>
     </div>
   )
