@@ -1,18 +1,21 @@
 import { useEffect, useState } from 'react'
-import { getAbout, type AboutInfo } from '../api'
 
 interface Props {
   onBack: () => void
 }
 
 export default function AboutPage({ onBack }: Props) {
-  const [about, setAbout] = useState<AboutInfo | null>(null)
+  const [readme, setReadme] = useState('')
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    getAbout()
-      .then(setAbout)
-      .catch(() => setAbout({ name: 'DocIntel RAG System', version: '1.0.0', creator: 'Divyansh Awasthi', readme: '' }))
+    fetch('/README.md')
+      .then((res) => {
+        if (!res.ok) throw new Error('README not found')
+        return res.text()
+      })
+      .then(setReadme)
+      .catch(() => setReadme('DocIntel RAG System - A latency-optimized document intelligence system.'))
       .finally(() => setLoading(false))
   }, [])
 
@@ -33,10 +36,10 @@ export default function AboutPage({ onBack }: Props) {
           </h2>
         </div>
         <h1 className="text-2xl font-bold tracking-tight text-neutral-900 mb-2">
-          {about?.name || 'DocIntel RAG System'}
+          DocIntel RAG System
         </h1>
         <p className="text-sm text-neutral-500 mb-8">
-          Version {about?.version || '1.0.0'} · Created by <span className="font-medium text-neutral-700">{about?.creator || 'Divyansh Awasthi'}</span>
+          Version 1.0.0 · Created by <span className="font-medium text-neutral-700">Divyansh Awasthi</span>
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -75,7 +78,7 @@ export default function AboutPage({ onBack }: Props) {
           ) : (
             <div className="bg-neutral-50 border border-neutral-200 rounded-sm p-6 overflow-x-auto">
               <pre className="text-xs text-neutral-700 whitespace-pre-wrap leading-relaxed font-mono">
-                {about?.readme || 'No README found.'}
+                {readme}
               </pre>
             </div>
           )}
