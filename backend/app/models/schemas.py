@@ -44,3 +44,8 @@ class StatusResponse(BaseModel):
     total_chunks: int
     documents_indexed: int
     status: str
+
+    @classmethod
+    def from_collection_stats(cls, stats: dict) -> "StatusResponse":
+        total = stats.get("total_chunks", 0)
+        return cls(total_chunks=total, documents_indexed=stats.get("documents_indexed", 0), status="active")

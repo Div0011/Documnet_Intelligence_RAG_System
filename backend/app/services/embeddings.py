@@ -59,7 +59,17 @@ def query(question: str, n_results: int = 20) -> List[Dict]:
 
 def collection_stats() -> Dict:
     collection = get_collection()
-    return {"total_chunks": collection.count()}
+    count = collection.count()
+    docs_indexed = 0
+    if count > 0:
+        try:
+            results = collection.get(include=["metadatas"])
+            metadatas = results.get("metadatas", []) or []
+            unique_sources = {m.get("source") for m in metadatas if m and m.get("source")}
+            docs_indexed = len(unique_sources)
+        except Exception:
+            docs_indexed = 0
+    return {"total_chunks": count, "documents_indexed": docs_indexed}
 
 
 def reset_collection():

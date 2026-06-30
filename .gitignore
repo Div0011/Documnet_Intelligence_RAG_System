@@ -22,6 +22,7 @@ build/
 # Data
 data/chroma/
 data/uploads/
+backend/data/
 !data/.gitkeep
 !data/chroma/.gitkeep
 !data/uploads/.gitkeep

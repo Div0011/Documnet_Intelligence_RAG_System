@@ -1,5 +1,6 @@
 from typing import List, Dict
 from sentence_transformers import CrossEncoder
+from app.services.embeddings import query, collection_stats
 
 TOP_K = 5
 MAX_DISTANCE = 1.0

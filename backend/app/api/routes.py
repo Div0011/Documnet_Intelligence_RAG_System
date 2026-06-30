@@ -7,7 +7,7 @@ from app.core.config import settings
 from app.models.schemas import UploadResponse, QueryRequest, QueryResponse, StatusResponse
 from app.services.ingestion import ingest_many
 from app.services.embeddings import add_chunks, collection_stats, reset_collection
-from app.services.retrieval import retrieve
+from app.services.retrieval import retrieve as retrieve_chunks
 from app.services.qa import answer_question
 from app.services.insights import suggest_insights
 
@@ -25,7 +25,7 @@ async def health():
 @router.get("/status", response_model=StatusResponse)
 async def status():
     stats = collection_stats()
-    return StatusResponse(**stats, status="active")
+    return StatusResponse(total_chunks=stats["total_chunks"], documents_indexed=stats.get("documents_indexed", 0), status="active")
 
 
 @router.post("/upload", response_model=List[UploadResponse])
@@ -67,7 +67,7 @@ async def query(request: QueryRequest):
     question = request.question.strip()
     if not question:
         raise HTTPException(status_code=400, detail="Question is required.")
-    chunks = retrieve(question)
+    chunks = retrieve_chunks(question)
     result = answer_question(question, chunks)
     return QueryResponse(**result)
 
